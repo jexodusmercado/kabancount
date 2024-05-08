@@ -2,14 +2,14 @@ import { z } from 'zod'
 
 export const SignInSchema = z.object({
     email: z.string().email(),
-    password: z.string().min(1, 'Password is required'),
+    password: z.string().min(1, 'Required'),
 })
 
 export type SignInType = z.infer<typeof SignInSchema>
 
 export const TokenSchema = z.object({
-    token: z.string(),
-    expiresAt: z.string(),
+    accessToken: z.string(),
+    expiresAt: z.number(),
     refreshToken: z.string(),
 })
 

@@ -2,7 +2,7 @@ import { axiosInstance } from '@/services'
 import { SignInType, TokenSchema } from './schema'
 
 export const signInApi = async (params: SignInType) => {
-    const response = await axiosInstance.post('/auth/signin', params)
+    const response = await axiosInstance.post('/sign-in', params)
 
     const token = TokenSchema.parse(response.data)
 
