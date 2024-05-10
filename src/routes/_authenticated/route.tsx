@@ -1,4 +1,6 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { TopBar } from './-components/top-bar'
+import { SideBar } from './-components/side-bar'
 
 export const Route = createFileRoute('/_authenticated')({
     beforeLoad: async ({ context, location }) => {
@@ -9,5 +11,17 @@ export const Route = createFileRoute('/_authenticated')({
             })
         }
     },
-    component: () => <Outlet />,
+    component: Index,
 })
+
+function Index() {
+    return (
+        <>
+            <TopBar />
+            <SideBar />
+            <main className="pt-20 ml-64 px-4">
+                <Outlet />
+            </main>
+        </>
+    )
+}

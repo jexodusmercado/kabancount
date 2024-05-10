@@ -7,9 +7,13 @@ export const signInApi = async (params: SignInType) => {
     const token = TokenSchema.parse(response.data)
 
     axiosInstance.defaults.headers.common['Authorization'] =
-        `Bearer ${token.token}`
+        `Bearer ${token.accessToken}`
     axiosInstance.defaults.headers.common['X-Refresh-Token'] =
         token.refreshToken
 
     return token
+}
+
+export const signOutApi = async () => {
+    return await axiosInstance.post('/sign-out')
 }
