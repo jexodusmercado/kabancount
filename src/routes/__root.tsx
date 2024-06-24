@@ -1,20 +1,19 @@
-import { AuthType } from '@/store/auth'
+import { AuthStore } from '@/store/auth'
 import { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { Toaster } from 'sonner'
 
-type ProjectContext = {
+interface MyRouterContext {
     queryClient: QueryClient
-    auth: AuthType
-    isAuthenticated: boolean
+    auth: AuthStore
 }
 
-export const Route = createRootRouteWithContext<ProjectContext>()({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
     component: () => (
         <>
+            <Toaster position="top-right" richColors closeButton />
             <Outlet />
-            <Toaster position="top-right" richColors />
             <TanStackRouterDevtools />
         </>
     ),

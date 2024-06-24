@@ -1,0 +1,13 @@
+.git
+public
+node_modules
+dist
+.dockerignore
+.gitignore
+.prettierrc
+package-*.json
+./src/tests/*
+*.env
+*.config.*
+*.gen.*
+*.d.*

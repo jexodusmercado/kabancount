@@ -1,13 +1,5 @@
 {
-    trailingComma: 'all',
-    tabWidth: 4,
-    printWidth: 80,
-    useTabs: false,
-    semi: false,
-    singleQuote: true,
-    quoteProps: 'as-needed',
-    bracketSpacing: true,
-    arrowParens: 'always',
-    jsxBracketSameLine: false,
-    endOfLine: 'lf',
+    "tabWidth": 4,
+    "semi": false,
+    "singleQuote": true,
 }

@@ -1,27 +1,24 @@
-import { TokenType } from '@/services/endpoints/auth/schema'
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
-import { atom } from 'jotai/vanilla'
+import { TokenType } from '@/services/auth/schema'
 
-export type AuthType = TokenType & {
+export type AuthStore = TokenType & {
     isAuthenticated: boolean
 }
 
-const localStorage = createJSONStorage<AuthType>()
-
-const initialAuth: AuthType = {
+const initialAuthData: AuthStore = {
     accessToken: '',
     expiresAt: 0,
     refreshToken: '',
     isAuthenticated: false,
 }
 
-export const authAtom = atomWithStorage<AuthType>(
-    'auth',
-    initialAuth,
-    localStorage,
-    { getOnInit: true },
-)
+const localJSONStorage = createJSONStorage<AuthStore>()
 
-export const isAuthenticatedAtom = atom<boolean>(
-    (get) => get(authAtom).isAuthenticated,
+export const authAtom = atomWithStorage(
+    'auth',
+    initialAuthData,
+    localJSONStorage,
+    {
+        getOnInit: true,
+    },
 )
