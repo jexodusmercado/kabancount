@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { formatToDate } from '@/lib/dayjs'
-import { ProductType } from '@/services/products/schema'
+import { ProductType } from '@/services/product/schema'
 import { Link } from '@tanstack/react-router'
 import { ColumnDef } from '@tanstack/react-table'
 import { PencilIcon } from 'lucide-react'
@@ -48,37 +48,53 @@ export const columns: ColumnDef<ProductType>[] = [
     {
         accessorKey: 'variants',
         header: '# Variants',
-        cell: ({ row }) => row.original.variants.length,
+        cell: ({ row }) => row.original.variants?.length || 0,
     },
     {
         accessorKey: 'price',
         header: 'Price',
         cell: ({ row }) => {
-            const getHighestPrice = (variants: ProductType['variants']) =>
-                Math.max(...variants.map((variant) => variant.basePrice))
+            const getHighestPrice = (variants: ProductType['variants']) => {
+                if (!variants) return 0
+                return Math.max(...variants.map((variant) => variant.basePrice))
+            }
 
-            const getLowestPrice = (variants: ProductType['variants']) =>
-                Math.min(...variants.map((variant) => variant.basePrice))
+            const getLowestPrice = (variants: ProductType['variants']) => {
+                if (!variants) return 0
+                return Math.min(...variants.map((variant) => variant.basePrice))
+            }
 
-            const highestPrice = getHighestPrice(row.original.variants)
-            const lowestPrice = getLowestPrice(row.original.variants)
+            if (row.original.variants && row.original.variants.length > 0) {
+                const highestPrice = getHighestPrice(row.original.variants)
+                const lowestPrice = getLowestPrice(row.original.variants)
 
-            return highestPrice === lowestPrice
-                ? `$${highestPrice}`
-                : `$${lowestPrice} - $${highestPrice}`
+                console.log(row.original.variants)
+
+                return highestPrice === lowestPrice
+                    ? `$${highestPrice}`
+                    : `$${lowestPrice} - $${highestPrice}`
+            }
+
+            return `$${row.original.basePrice}`
         },
     },
     {
         accessorKey: 'stock',
         header: 'Stock',
         cell: ({ row }) => {
-            const getStock = (variants: ProductType['variants']) =>
-                variants.reduce(
+            const getStock = (variants: ProductType['variants']) => {
+                if (!variants) return 0
+                return variants.reduce(
                     (acc, variant) => acc + variant.inventory.quantity,
                     0,
                 )
+            }
 
-            return formatNumber(getStock(row.original.variants))
+            if (row.original.variants && row.original.variants.length > 0) {
+                return formatNumber(getStock(row.original.variants))
+            }
+
+            return formatNumber(row.original.inventory.quantity)
         },
     },
     {

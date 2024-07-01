@@ -4,7 +4,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { DataTable } from './-components/data-table'
 import { columns } from './-components/columns'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getProductsApi } from '@/services/products'
+import { getProductsApi } from '@/services/product'
 
 export const Route = createFileRoute('/_auth/products/')({
     loader: (opts) =>

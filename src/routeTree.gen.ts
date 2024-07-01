@@ -17,6 +17,7 @@ import { Route as RouteImport } from './routes/route'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard/route'
 import { Route as AuthProductsIndexImport } from './routes/_auth/products/index'
 import { Route as AuthProductsCreateImport } from './routes/_auth/products/create'
+import { Route as AuthProductsProductIdImport } from './routes/_auth/products/$productId'
 
 // Create/Update Routes
 
@@ -47,6 +48,11 @@ const AuthProductsIndexRoute = AuthProductsIndexImport.update({
 
 const AuthProductsCreateRoute = AuthProductsCreateImport.update({
   path: '/products/create',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
+const AuthProductsProductIdRoute = AuthProductsProductIdImport.update({
+  path: '/products/$productId',
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
@@ -82,6 +88,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRouteImport
     }
+    '/_auth/products/$productId': {
+      id: '/_auth/products/$productId'
+      path: '/products/$productId'
+      fullPath: '/products/$productId'
+      preLoaderRoute: typeof AuthProductsProductIdImport
+      parentRoute: typeof AuthRouteImport
+    }
     '/_auth/products/create': {
       id: '/_auth/products/create'
       path: '/products/create'
@@ -105,6 +118,7 @@ export const routeTree = rootRoute.addChildren({
   RouteRoute,
   AuthRouteRoute: AuthRouteRoute.addChildren({
     AuthDashboardRouteRoute,
+    AuthProductsProductIdRoute,
     AuthProductsCreateRoute,
     AuthProductsIndexRoute,
   }),
@@ -131,6 +145,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/dashboard",
+        "/_auth/products/$productId",
         "/_auth/products/create",
         "/_auth/products/"
       ]
@@ -140,6 +155,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_auth/dashboard": {
       "filePath": "_auth/dashboard/route.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/products/$productId": {
+      "filePath": "_auth/products/$productId.tsx",
       "parent": "/_auth"
     },
     "/_auth/products/create": {

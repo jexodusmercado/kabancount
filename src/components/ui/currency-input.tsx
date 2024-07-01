@@ -50,8 +50,23 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
         }
 
         const onHandleFocus = () => {
+            if (passedValue === 0) {
+                setInputValue('')
+                return
+            }
             setInputValue(passedValue.toString())
         }
+
+        React.useEffect(() => {
+            if (props.value) {
+                setInputValue(
+                    props.value.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                    }),
+                )
+                setPassedValue(Number(props.value))
+            }
+        }, [props.value])
 
         React.useEffect(() => {
             if (getPassedNumber) {

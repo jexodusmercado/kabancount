@@ -1,3 +1,25 @@
+import { Button } from '@/components/ui/button'
+import { getProductByIdApi, updateProductApi } from '@/services/product'
+import {
+    MutableProductSchema,
+    MutableProductType,
+} from '@/services/product/schema'
+import {
+    queryOptions,
+    useMutation,
+    useQuery,
+    useQueryClient,
+    useSuspenseQuery,
+} from '@tanstack/react-query'
+import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
+import {
+    useForm,
+    SubmitHandler,
+    useFormContext,
+    useFieldArray,
+} from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { getCategoriesApi } from '@/services/category'
 import {
     Form,
     FormControl,
@@ -6,26 +28,6 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { CurrencyInput } from '@/components/ui/currency-input'
-import { Badge } from '@/components/ui/badge'
-import {
-    MutableProductSchema,
-    MutableProductType,
-} from '@/services/product/schema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
-import {
-    SubmitHandler,
-    useFieldArray,
-    useForm,
-    useFormContext,
-} from 'react-hook-form'
-import { NumberInput } from '@/components/ui/number-input'
-import { Button } from '@/components/ui/button'
-import { PlusIcon, TrashIcon, XIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Separator } from '@/components/ui/separator'
 import {
     Card,
     CardContent,
@@ -33,7 +35,21 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import { CategoryCombobox } from './-components/category-dropdown'
+import { CurrencyInput } from '@/components/ui/currency-input'
+import { NumberInput } from '@/components/ui/number-input'
 import { useEffect, useState } from 'react'
+import { PlusIcon, TrashIcon, XIcon } from 'lucide-react'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import {
     Table,
     TableBody,
@@ -42,29 +58,23 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table'
-import {
-    queryOptions,
-    useMutation,
-    useQuery,
-    useQueryClient,
-} from '@tanstack/react-query'
-import { getCategoriesApi } from '@/services/category'
-import { CategoryCombobox } from './-components/category-dropdown'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
-import { createProductApi } from '@/services/product'
+import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/_auth/products/create')({
-    loader: (opts) =>
-        opts.context.queryClient.ensureQueryData(categoriesQueryOptions()),
-    component: CreateProduct,
+export const Route = createFileRoute('/_auth/products/$productId')({
+    loader: ({ params, context }) => {
+        context.queryClient.ensureQueryData(
+            getProductByIDQueryOptions(params.productId),
+        )
+    },
+    component: () => <UpdateCategoryPage />,
 })
+
+const getProductByIDQueryOptions = (productId: string) =>
+    queryOptions({
+        queryKey: ['product', productId],
+        queryFn: () => getProductByIdApi(productId),
+    })
 
 const categoriesQueryOptions = () =>
     queryOptions({
@@ -72,44 +82,64 @@ const categoriesQueryOptions = () =>
         queryFn: getCategoriesApi,
     })
 
-function CreateProduct() {
+function UpdateCategoryPage() {
+    const params = Route.useParams()
+
+    const productQuery = useSuspenseQuery(
+        getProductByIDQueryOptions(params.productId),
+    )
+
+    const product = productQuery.data
+
     const queryClient = useQueryClient()
-    const router = useRouter()
     const categoriesQuery = useQuery(categoriesQueryOptions())
     const categories = categoriesQuery.data?.results || []
     const form = useForm<MutableProductType>({
         defaultValues: {
-            productName: '',
-            productSKU: '',
-            productBarcode: '',
-            productBasePrice: 0,
-            productCostPrice: 0,
-            productQuantity: 0,
-            productStatus: undefined,
-            variantOptionName: '',
-            variants: [],
+            productName: product.name,
+            productSKU: product.sku,
+            categoryID: product.categoryId,
+            productBarcode: product.barcode,
+            productBasePrice: product.basePrice,
+            productCostPrice: product.costPrice,
+            productQuantity: product.inventory.quantity,
+            productStatus: product.status,
+            variantOptionName:
+                product.variants && product.variants.length > 0
+                    ? product.variants[0].name
+                    : '',
+            variants: product.variants
+                ? product.variants.map((v) => ({
+                      variantID: v.id,
+                      variantOptionValue: v.value,
+                      variantSKU: v.sku,
+                      variantBarcode: v.barcode,
+                      variantBasePrice: v.basePrice,
+                      variantCostPrice: v.costPrice,
+                      variantStatus: v.status,
+                      variantQuantity: v.inventory.quantity,
+                  }))
+                : [],
         },
         resolver: zodResolver(MutableProductSchema),
     })
 
-    const createProductMu = useMutation({
-        mutationFn: (data: MutableProductType) => createProductApi(data),
+    const updateCategoryMu = useMutation({
+        mutationFn: (data: MutableProductType) =>
+            updateProductApi(product.id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ['products'],
+                queryKey: ['product', product.id],
             })
-            form.reset()
-
-            router.navigate({ to: '/products' })
         },
     })
 
     const onSubmit: SubmitHandler<MutableProductType> = (data) => {
-        const promisedMutation = createProductMu.mutateAsync(data)
+        const promisedMutation = updateCategoryMu.mutateAsync(data)
         toast.promise(promisedMutation, {
-            loading: 'Creating product...',
-            success: 'Product created successfully',
-            error: 'Failed to create product',
+            loading: 'Updating product...',
+            success: 'Product updated successfully',
+            error: 'Failed to update product',
         })
     }
 
@@ -122,10 +152,10 @@ function CreateProduct() {
         <div className="space-y-4">
             <div className="flex flex-row items-center justify-between">
                 <span className="text-lg">
-                    <Button variant="link" className="text-2xl p-0" asChild>
+                    <Button variant="link" className="text-lg p-0" asChild>
                         <Link to="/products">Products </Link>
                     </Button>
-                    <span> / </span> <span> Create Product </span>
+                    <span> / </span> <span> {product.name}</span>
                 </span>
             </div>
             <div className="flex items-center justify-center">
@@ -210,6 +240,9 @@ function CreateProduct() {
                                                                 }
                                                                 onSelect={
                                                                     field.onChange
+                                                                }
+                                                                value={
+                                                                    field.value
                                                                 }
                                                             />
                                                         </div>
@@ -345,7 +378,7 @@ function CreateProduct() {
                                 <Card className="p-6 m-0 col-span-full">
                                     <CardContent className="p-0 flex items-center justify-end">
                                         <Button type="submit">
-                                            Create Product
+                                            Update Product
                                         </Button>
                                     </CardContent>
                                 </Card>
@@ -378,6 +411,14 @@ function ProductVariants() {
         replace([])
     }
 
+    const handleDeleteVariantValue = (index: number) => {
+        const variantsTBD = getValues('deletedVariantIDs') || []
+        const variantID = variants[index]?.variantID || ''
+
+        remove(index)
+        setValue('deletedVariantIDs', [...variantsTBD, variantID])
+    }
+
     const startEditMode = () => {
         setAddVariant(true)
         setEditMode(true)
@@ -392,7 +433,7 @@ function ProductVariants() {
         })
     }
 
-    if (!addVariant) {
+    if (!addVariant && !variants.length) {
         return (
             <Card className="col-span-1">
                 <CardHeader>
@@ -497,7 +538,7 @@ function ProductVariants() {
                             <Button
                                 type="button"
                                 variant="link"
-                                onClick={() => remove(index)}
+                                onClick={() => handleDeleteVariantValue(index)}
                             >
                                 <TrashIcon className="size-5" />
                             </Button>

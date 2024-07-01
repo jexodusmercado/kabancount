@@ -42,8 +42,20 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
         }
 
         const onHandleFocus = () => {
+            if (passedValue === 0) {
+                setInputValue('')
+                return
+            }
+
             setInputValue(passedValue.toString())
         }
+
+        React.useEffect(() => {
+            if (props.value) {
+                setInputValue(props.value.toLocaleString('en-US'))
+                setPassedValue(Number(props.value))
+            }
+        }, [props.value])
 
         React.useEffect(() => {
             if (getPassedNumber) {
