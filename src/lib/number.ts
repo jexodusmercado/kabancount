@@ -10,8 +10,6 @@ export function formatCurrency(value: number) {
 }
 
 export function formatStringToCurrency(value: string) {
-    console.log('test')
-    console.log(value)
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
     }).format(Number(value))

@@ -11,7 +11,7 @@ import {
     useQueryClient,
     useSuspenseQuery,
 } from '@tanstack/react-query'
-import { Link, createFileRoute, useRouter } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import {
     useForm,
     SubmitHandler,
@@ -60,6 +60,8 @@ import {
 } from '@/components/ui/table'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { MediaDialog } from '@/components/shared/media-dialog'
+import { VariantImageSelectorDialog } from './-components/variant-image-selector-dialog'
 
 export const Route = createFileRoute('/_auth/products/$productId')({
     loader: ({ params, context }) => {
@@ -83,6 +85,7 @@ const categoriesQueryOptions = () =>
     })
 
 function UpdateCategoryPage() {
+    const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
     const params = Route.useParams()
 
     const productQuery = useSuspenseQuery(
@@ -90,6 +93,8 @@ function UpdateCategoryPage() {
     )
 
     const product = productQuery.data
+
+    console.log(product)
 
     const queryClient = useQueryClient()
     const categoriesQuery = useQuery(categoriesQueryOptions())
@@ -104,6 +109,7 @@ function UpdateCategoryPage() {
             productCostPrice: product.costPrice,
             productQuantity: product.inventory.quantity,
             productStatus: product.status,
+            productMedias: product.ProductMedia || [],
             variantOptionName:
                 product.variants && product.variants.length > 0
                     ? product.variants[0].name
@@ -118,11 +124,14 @@ function UpdateCategoryPage() {
                       variantCostPrice: v.costPrice,
                       variantStatus: v.status,
                       variantQuantity: v.inventory.quantity,
+                      variantMedia: v?.media || undefined,
                   }))
                 : [],
         },
         resolver: zodResolver(MutableProductSchema),
     })
+
+    const selectedProductImages = form.watch('productMedias') || []
 
     const updateCategoryMu = useMutation({
         mutationFn: (data: MutableProductType) =>
@@ -142,11 +151,6 @@ function UpdateCategoryPage() {
             error: 'Failed to update product',
         })
     }
-
-    useEffect(() => {
-        console.log('error')
-        console.log(form.formState.errors)
-    }, [form.formState.errors])
 
     return (
         <div className="space-y-4">
@@ -254,15 +258,38 @@ function UpdateCategoryPage() {
                                     </CardContent>
                                 </Card>
 
-                                {/*<Card className="col-span-full">
+                                <Card className="col-span-full">
                                     <CardHeader>
                                         <CardTitle> Media </CardTitle>
                                         <CardDescription>
                                             Manage your media
                                         </CardDescription>
-                                        <CardContent></CardContent>
+                                        <CardContent className="p-0 space-y-2">
+                                            {selectedProductImages.length >
+                                                0 && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {selectedProductImages.map(
+                                                        (media) => (
+                                                            <div
+                                                                key={media.id}
+                                                                className="aspect-w-1 aspect-h-1"
+                                                            >
+                                                                <img
+                                                                    src={`${BUCKET_URL}${media.url}`}
+                                                                    alt={
+                                                                        media.name
+                                                                    }
+                                                                    className="w-full h-48 object-cover rounded-md"
+                                                                />
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            )}
+                                            <MediaDialog />
+                                        </CardContent>
                                     </CardHeader>
-                                </Card>*/}
+                                </Card>
 
                                 <Card>
                                     <CardHeader>
@@ -416,6 +443,8 @@ function ProductVariants() {
         const variantID = variants[index]?.variantID || ''
 
         remove(index)
+
+        if (!variantID) return
         setValue('deletedVariantIDs', [...variantsTBD, variantID])
     }
 
@@ -594,7 +623,8 @@ function ProductVariants() {
                     <Table className="w-[48rem]">
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Variant</TableHead>
+                                <TableHead className="">Image</TableHead>
+                                <TableHead className="">Variant</TableHead>
                                 <TableHead className="w-36">
                                     Base Price
                                 </TableHead>
@@ -606,9 +636,16 @@ function ProductVariants() {
                                 <TableHead className="w-48">Barcode</TableHead>
                             </TableRow>
                         </TableHeader>
+
                         <TableBody>
                             {fields.map((field, index) => (
                                 <TableRow key={index}>
+                                    <TableCell>
+                                        <VariantImageSelectorDialog
+                                            index={index}
+                                        />
+                                    </TableCell>
+
                                     <TableCell>
                                         <FormField
                                             control={control}

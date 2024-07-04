@@ -59,6 +59,8 @@ import {
 } from '@/components/ui/select'
 import { createProductApi } from '@/services/product'
 import { toast } from 'sonner'
+import { MediaDialog } from '@/components/shared/media-dialog'
+import { VariantImageSelectorDialog } from './-components/variant-image-selector-dialog'
 
 export const Route = createFileRoute('/_auth/products/create')({
     loader: (opts) =>
@@ -73,6 +75,7 @@ const categoriesQueryOptions = () =>
     })
 
 function CreateProduct() {
+    const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
     const queryClient = useQueryClient()
     const router = useRouter()
     const categoriesQuery = useQuery(categoriesQueryOptions())
@@ -91,6 +94,8 @@ function CreateProduct() {
         },
         resolver: zodResolver(MutableProductSchema),
     })
+
+    const selectedProductImages = form.watch('productMedias') || []
 
     const createProductMu = useMutation({
         mutationFn: (data: MutableProductType) => createProductApi(data),
@@ -112,11 +117,6 @@ function CreateProduct() {
             error: 'Failed to create product',
         })
     }
-
-    useEffect(() => {
-        console.log('error')
-        console.log(form.formState.errors)
-    }, [form.formState.errors])
 
     return (
         <div className="space-y-4">
@@ -221,15 +221,38 @@ function CreateProduct() {
                                     </CardContent>
                                 </Card>
 
-                                {/*<Card className="col-span-full">
+                                <Card className="col-span-full">
                                     <CardHeader>
                                         <CardTitle> Media </CardTitle>
                                         <CardDescription>
                                             Manage your media
                                         </CardDescription>
-                                        <CardContent></CardContent>
+                                        <CardContent className="p-0 space-y-2">
+                                            {selectedProductImages.length >
+                                                0 && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {selectedProductImages.map(
+                                                        (media) => (
+                                                            <div
+                                                                key={media.id}
+                                                                className="aspect-w-1 aspect-h-1"
+                                                            >
+                                                                <img
+                                                                    src={`${BUCKET_URL}${media.url}`}
+                                                                    alt={
+                                                                        media.name
+                                                                    }
+                                                                    className="w-full h-48 object-cover rounded-md"
+                                                                />
+                                                            </div>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            )}
+                                            <MediaDialog />
+                                        </CardContent>
                                     </CardHeader>
-                                </Card>*/}
+                                </Card>
 
                                 <Card>
                                     <CardHeader>
@@ -494,13 +517,15 @@ function ProductVariants() {
                                     </FormItem>
                                 )}
                             />
-                            <Button
-                                type="button"
-                                variant="link"
-                                onClick={() => remove(index)}
-                            >
-                                <TrashIcon className="size-5" />
-                            </Button>
+                            {index > 0 && (
+                                <Button
+                                    type="button"
+                                    variant="link"
+                                    onClick={() => remove(index)}
+                                >
+                                    <TrashIcon className="size-5" />
+                                </Button>
+                            )}
                         </div>
                     ))}
                     <div className="col-span-full">
@@ -553,7 +578,8 @@ function ProductVariants() {
                     <Table className="w-[48rem]">
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Variant</TableHead>
+                                <TableHead className="">Image</TableHead>
+                                <TableHead className="">Variant</TableHead>
                                 <TableHead className="w-36">
                                     Base Price
                                 </TableHead>
@@ -568,6 +594,11 @@ function ProductVariants() {
                         <TableBody>
                             {fields.map((field, index) => (
                                 <TableRow key={index}>
+                                    <TableCell>
+                                        <VariantImageSelectorDialog
+                                            index={index}
+                                        />
+                                    </TableCell>
                                     <TableCell>
                                         <FormField
                                             control={control}

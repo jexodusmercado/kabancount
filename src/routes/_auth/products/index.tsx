@@ -3,8 +3,16 @@ import { Input } from '@/components/ui/input'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { DataTable } from './-components/data-table'
 import { columns } from './-components/columns'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { getProductsApi } from '@/services/product'
+import {
+    queryOptions,
+    useQuery,
+    useQueryClient,
+    useSuspenseQuery,
+} from '@tanstack/react-query'
+import { getProductsApi, searchProductByQueryApi } from '@/services/product'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useDebounce } from '@uidotdev/usehooks'
+import { ProductsType } from '@/services/product/schema'
 
 export const Route = createFileRoute('/_auth/products/')({
     loader: (opts) =>
@@ -21,6 +29,23 @@ const productsQueryOptions = () =>
 function Products() {
     const productsQuery = useSuspenseQuery(productsQueryOptions())
     const products = productsQuery.data
+    const [query, setQuery] = useState('')
+    const debouncedQuery = useDebounce(query, 500)
+    const [data, setData] = useState<ProductsType>([])
+
+    const { data: queryProducts } = useQuery({
+        queryKey: ['products', debouncedQuery],
+        queryFn: () => searchProductByQueryApi(debouncedQuery),
+    })
+
+    useEffect(() => {
+        if (debouncedQuery && queryProducts) {
+            setData(queryProducts.results)
+        } else {
+            setData(products.results)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedQuery, products, queryProducts])
 
     return (
         <div className="h-full w-full space-y-4">
@@ -38,6 +63,7 @@ function Products() {
                     <Input
                         placeholder="Search"
                         className="max-w-[10rem] md:max-w-sm bg-gray-50"
+                        onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>
                 <div>
@@ -47,7 +73,7 @@ function Products() {
                 </div>
             </div>
             <div>
-                <DataTable columns={columns} data={products.results} />
+                <DataTable columns={columns} data={data} />
             </div>
         </div>
     )

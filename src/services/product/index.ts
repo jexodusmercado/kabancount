@@ -13,17 +13,40 @@ export const getProductsApi = async () => {
     return data
 }
 
+export const searchProductByQueryApi = async (query: string) => {
+    const res = await axiosInstance.get(
+        `/products/search?q=${query}&pageSize=50`,
+    )
+
+    return PaginatedProductsSchema.parse(res.data)
+}
+
 export const createProductApi = async (props: MutableProductType) => {
     const bodyVariants = props.variants.map((variant) => {
-        return {
+        const combineLatest = {
             variantOptionName: props.variantOptionName,
             ...variant,
         }
+
+        if (variant?.variantMedia) {
+            combineLatest.variantMediaID = variant.variantMedia.id
+        }
+
+        delete combineLatest.variantMedia
+
+        return combineLatest
     })
 
     const body = {
         ...props,
         variants: bodyVariants,
+    }
+
+    if (props.productMedias) {
+        const mediaIDs = props.productMedias.map((media) => media.id)
+
+        body.productMediaID = mediaIDs
+        delete body.productMedias
     }
 
     const res = await axiosInstance.post('/products', body)
@@ -36,16 +59,35 @@ export const updateProductApi = async (
     props: MutableProductType,
 ) => {
     const { deletedVariantIDs } = props
-    const bodyVariants = props.variants.map((variant) => {
-        return {
-            variantOptionName: props.variantOptionName,
-            ...variant,
-        }
-    })
+
+    const bodyVariants =
+        props.variants.map((variant) => {
+            const combineLatest = {
+                variantOptionName: props.variantOptionName,
+                ...variant,
+            }
+
+            if (variant?.variantMedia) {
+                console.log('variant.variantMedia', variant.variantMedia.name)
+                console.log('variant.variantMedia', variant.variantMedia.id)
+                combineLatest.variantMediaID = variant.variantMedia.id
+            }
+
+            delete combineLatest.variantMedia
+
+            return combineLatest
+        }) || []
 
     const body = {
         ...props,
         variants: bodyVariants,
+    }
+
+    if (props.productMedias) {
+        const mediaIDs = props.productMedias.map((media) => media.id)
+
+        body.productMediaID = mediaIDs
+        delete body.productMedias
     }
 
     const updateRes = await axiosInstance.put(`/products/${id}`, body)

@@ -1,5 +1,6 @@
 import z from 'zod'
 import { InventorySchema } from '../inventory/schema'
+import { mediaSchema } from '../media/schema'
 
 export const ProductVariantSchema = z.object({
     id: z.string(),
@@ -14,6 +15,7 @@ export const ProductVariantSchema = z.object({
     barcode: z.string(),
     status: z.string(),
     inventory: InventorySchema,
+    media: mediaSchema.nullish(),
 })
 
 export type ProductVariantType = z.infer<typeof ProductVariantSchema>
@@ -33,6 +35,7 @@ export const ProductSchema = z.object({
     status: z.string(),
     inventory: InventorySchema,
     variants: z.array(ProductVariantSchema).nullish(),
+    ProductMedia: z.array(mediaSchema).nullish(),
 })
 
 export type ProductType = z.infer<typeof ProductSchema>
@@ -60,6 +63,8 @@ export const MutableProductVariantSchema = z.object({
     variantCostPrice: z.number().default(0),
     variantStatus: z.string().default('active'),
     variantQuantity: z.number().default(0),
+    variantMedia: mediaSchema.optional(),
+    variantMediaID: z.string().optional(),
 })
 
 export type MutableProductVariantType = z.infer<
@@ -78,6 +83,8 @@ export const MutableProductSchema = z
         productStatus: z.string().min(1, 'Product status is required'),
         deletedVariantIDs: z.array(z.string()).optional(),
         variantOptionName: z.string().optional(),
+        productMedias: z.array(mediaSchema).optional(),
+        productMediaID: z.array(z.string()).optional(),
         variants: z.array(MutableProductVariantSchema.optional()),
     })
     .refine(

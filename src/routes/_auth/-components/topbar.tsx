@@ -8,7 +8,7 @@ import {
 } from '@headlessui/react'
 import { Fragment } from 'react'
 import { Avatar, AvatarImage } from '@/components/ui/avatar'
-import { useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import PersonPlaceholder from '@/assets/images/person-placeholder.png'
 import { ChevronDownIcon, MenuIcon } from 'lucide-react'
 import { sidebarOpenAtom } from '@/store/sidebar'
@@ -20,21 +20,19 @@ import axiosInstance from '@/services/axios'
 
 export function Topbar() {
     const setSideBarOpen = useSetAtom(sidebarOpenAtom)
-    const setAuth = useSetAtom(authAtom)
+    const [auth, setAuth] = useAtom(authAtom)
     const router = useRouter()
     const queryClient = useQueryClient()
 
     const handleLogOut = () => {
         queryClient.clear()
         setAuth({
-            expiresAt: 0,
-            accessToken: '',
-            refreshToken: '',
+            ...auth,
             isAuthenticated: false,
         })
 
-        axiosInstance.defaults.headers.common['Authorization'] = ''
-        axiosInstance.defaults.headers.common['X-Refresh-Token'] = ''
+        delete axiosInstance.defaults.headers.common['Authorization']
+        delete axiosInstance.defaults.headers.common['X-Refresh-Token']
 
         router.invalidate().finally(() => {
             router.navigate({ to: '/sign-in' })
