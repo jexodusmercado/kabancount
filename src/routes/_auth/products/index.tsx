@@ -3,14 +3,9 @@ import { Input } from '@/components/ui/input'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { DataTable } from './-components/data-table'
 import { columns } from './-components/columns'
-import {
-    queryOptions,
-    useQuery,
-    useQueryClient,
-    useSuspenseQuery,
-} from '@tanstack/react-query'
+import { queryOptions, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { getProductsApi, searchProductByQueryApi } from '@/services/product'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ProductsType } from '@/services/product/schema'
 

@@ -46,7 +46,7 @@ import {
 import { CategoryCombobox } from './-components/category-dropdown'
 import { CurrencyInput } from '@/components/ui/currency-input'
 import { NumberInput } from '@/components/ui/number-input'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { PlusIcon, TrashIcon, XIcon } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'

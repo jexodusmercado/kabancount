@@ -14,7 +14,7 @@ import {
     TableRow,
 } from '@/components/ui/table'
 import { useEffect } from 'react'
-import { ProductType } from '@/services/products/schema'
+import { ProductType } from '@/services/product/schema'
 
 interface DataTableProps {
     columns: ColumnDef<ProductType>[]
