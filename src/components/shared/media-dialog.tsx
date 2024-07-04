@@ -97,6 +97,73 @@ const LoadingMediaDialogContent = (props: MediaDialogContentProps) => {
 }
 
 const EmptyMediaDialogContent = () => {
+    const maxSize = 25
+    const acceptedFormats = ['png', 'jpeg', 'jpg', 'gif']
+    const maxFileSizeInBytes = maxSize * 1024 * 1024
+
+    const inputRef = useRef<ElementRef<'input'>>(null)
+    const queryClient = useQueryClient()
+    const formContext = useFormContext<MutableProductType>()
+    const [selectedMedia, setSelectedMedia] = useState<MediaType[]>([])
+
+    const uploadMediaMu = useMutation({
+        mutationFn: (data: CreateMediaType) => createMediaApi(data),
+        onSuccess: (data) => {
+            setSelectedMedia(data)
+        },
+    })
+
+    const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files ? event.target.files : null
+        if (!files) {
+            toast.error('No file selected')
+            return
+        }
+
+        const arrayFiles = Array.from(files)
+
+        arrayFiles.forEach((file, index) => {
+            if (
+                !acceptedFormats.includes(file.type.split('/')[1].toLowerCase())
+            ) {
+                arrayFiles.splice(index, 1)
+                toast.error(
+                    `The file ${file.name}. File format not supported. Supported formats are ${acceptedFormats.join(', ')}`,
+                )
+                return
+            }
+
+            if (file.size >= maxFileSizeInBytes) {
+                arrayFiles.splice(index, 1)
+                toast.error(
+                    `The file ${file.name}. File is too large. Maximum file size is ${maxSize}MB`,
+                )
+
+                return
+            }
+        })
+
+        const uploadPromise = uploadMediaMu.mutateAsync({
+            images: arrayFiles,
+        })
+
+        toast.promise(uploadPromise, {
+            loading: 'Uploading media...',
+            success: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['media'],
+                })
+                return 'Media uploaded successfully'
+            },
+            error: 'Failed to upload media',
+        })
+    }
+
+    useEffect(() => {
+        formContext.setValue('productMedias', selectedMedia)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedMedia])
+
     return (
         <DialogContent className="w-full max-w-4xl h-1/2">
             <DialogHeader>
@@ -113,9 +180,11 @@ const EmptyMediaDialogContent = () => {
                     >
                         <h1> Upload File </h1>
                         <Input
+                            ref={inputRef}
                             id="upload-file"
                             type="file"
                             className="hidden"
+                            onChange={handleOnChange}
                             multiple
                         />
                     </Label>
