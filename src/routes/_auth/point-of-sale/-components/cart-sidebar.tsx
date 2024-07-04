@@ -1,23 +1,117 @@
-import { cartItemsAtom } from '@/store/cart'
+import { Button } from '@/components/ui/button'
+import { CartItemsType, cartItemsAtom } from '@/store/cart'
 import { useAtom } from 'jotai'
+import { toast } from 'sonner'
 
 const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
 
 export function CartSidebar() {
     const [cartItems, setCartItems] = useAtom(cartItemsAtom)
+
+    const handleRemoveItem = (value: CartItemsType) => {
+        if (value.variantID) {
+            setCartItems((prev) =>
+                prev.filter((item) => item.variantID !== value.variantID),
+            )
+        } else {
+            setCartItems((prev) => prev.filter((item) => item.ID !== value.ID))
+        }
+    }
+
+    const handleSubtractQty = (value: CartItemsType) => {
+        if (value.variantID) {
+            setCartItems((prev) => {
+                const item = prev.find(
+                    (item) => item.variantID === value.variantID,
+                )
+                if (item) {
+                    return prev.map((item) => {
+                        if (item.variantID === value.variantID) {
+                            return { ...item, cartQty: item.cartQty - 1 }
+                        }
+                        return item
+                    })
+                }
+                return prev
+            })
+        } else {
+            setCartItems((prev) => {
+                const item = prev.find((item) => item.ID === value.ID)
+                if (item) {
+                    return prev.map((item) => {
+                        if (item.ID === value.ID) {
+                            return { ...item, cartQty: item.cartQty - 1 }
+                        }
+                        return item
+                    })
+                }
+                return prev
+            })
+        }
+    }
+
+    const handleAddQty = (value: CartItemsType) => {
+        if (value.quantity <= value.cartQty) {
+            toast.error('Cannot add more than available quantity')
+            return
+        }
+        if (value.variantID) {
+            setCartItems((prev) => {
+                const item = prev.find(
+                    (item) => item.variantID === value.variantID,
+                )
+                if (item) {
+                    return prev.map((item) => {
+                        if (item.variantID === value.variantID) {
+                            return { ...item, cartQty: item.cartQty + 1 }
+                        }
+                        return item
+                    })
+                }
+                return prev
+            })
+        } else {
+            setCartItems((prev) => {
+                const item = prev.find((item) => item.ID === value.ID)
+                if (item) {
+                    return prev.map((item) => {
+                        if (item.ID === value.ID) {
+                            return { ...item, cartQty: item.cartQty + 1 }
+                        }
+                        return item
+                    })
+                }
+                return prev
+            })
+        }
+    }
+
+    const calculateTotal = () => {
+        let total = 0
+        cartItems.forEach((item) => {
+            total += item.price * item.cartQty
+        })
+        return total
+    }
+
     return (
-        <div className="w-24 md:w-96 fixed top-16 right-0 h-[calc(100%-4rem)] border-l border-gray-200">
+        <div className="w-36 md:w-96 fixed top-16 right-0 h-[calc(100%-4rem)] border-l border-gray-200">
             <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 py-3">
                 <div className="flex justify-between items-center">
                     <h1 className="text-lg font-bold">
                         Cart ({cartItems.length})
                     </h1>
-                    <button className="text-sm text-blue-500">Clear</button>
+                    <button
+                        className="text-sm text-blue-500"
+                        onClick={() => setCartItems([])}
+                    >
+                        Clear
+                    </button>
                 </div>
 
                 <div className="flex flex-col gap-y-3">
-                    <div className="flex justify-between items-center h-1/2 overflow-auto">
-                        {cartItems.length &&
+                    <div className="flex flex-col  h-96 overflow-auto gap-4">
+                        {cartItems.length > 0 &&
                             cartItems.map((item, index) => (
                                 <div
                                     key={index}
@@ -30,7 +124,7 @@ export function CartSidebar() {
                                                 : 'https://via.placeholder.com/150'
                                         }
                                         alt={item.productName}
-                                        className="w-40 h-32 object-cover object-center rounded-lg"
+                                        className="hidden md:block w-28 h-20 object-cover object-center rounded-lg"
                                     />
                                     <div className="">
                                         <p className="text-sm font-semibold">
@@ -47,20 +141,47 @@ export function CartSidebar() {
                                             P{item.price}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            Quantity: {item.quantity}
+                                            Quantity: {item.cartQty}
                                         </p>
 
-                                        <div className="flex gap-x-1 items-center">
-                                            <button className="text-xs text-blue-500">
-                                                Edit
+                                        <div className="flex gap-x-2 items-center">
+                                            <button
+                                                className="text-xs text-blue-500"
+                                                onClick={() =>
+                                                    handleSubtractQty(item)
+                                                }
+                                            >
+                                                -
                                             </button>
-                                            <button className="text-xs text-red-500">
+                                            <button
+                                                className="text-xs text-blue-500"
+                                                onClick={() =>
+                                                    handleAddQty(item)
+                                                }
+                                            >
+                                                +
+                                            </button>
+                                            <button
+                                                className="text-xs text-red-500"
+                                                onClick={() =>
+                                                    handleRemoveItem(item)
+                                                }
+                                            >
                                                 Remove
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                             ))}
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <p className="text-sm font-semibold">Total</p>
+                        <p className="text-sm font-semibold">
+                            P{calculateTotal()}
+                        </p>
+                    </div>
+                    <div>
+                        <Button> Checkout </Button>
                     </div>
                 </div>
             </div>

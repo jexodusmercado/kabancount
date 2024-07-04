@@ -8,7 +8,7 @@ export const Route = createFileRoute('/_auth/point-of-sale')({
 function Index() {
     return (
         <>
-            <div className="pr-96">
+            <div className="pr-36 md:pr-96">
                 <Outlet />
             </div>
             <CartSidebar />

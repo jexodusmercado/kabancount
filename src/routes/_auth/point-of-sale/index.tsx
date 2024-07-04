@@ -65,7 +65,37 @@ function ListOfProducts(props: ListOfProductsProps) {
     const setCartItems = useSetAtom(cartItemsAtom)
 
     const handleAddToCart = (value: PointOfSaleCategoryItemsType) => {
-        setCartItems((prev) => [...prev, value])
+        setCartItems((prev) => {
+            if (!prev) {
+                return [{ ...value, cartQty: 1 }]
+            }
+
+            if (value.variantID) {
+                const item = prev.find(
+                    (item) => item.variantID === value.variantID,
+                )
+                if (item) {
+                    return prev.map((item) => {
+                        if (item.variantID === value.variantID) {
+                            return { ...item, cartQty: item.cartQty + 1 }
+                        }
+                        return item
+                    })
+                }
+            } else {
+                const item = prev.find((item) => item.ID === value.ID)
+                if (item) {
+                    return prev.map((item) => {
+                        if (item.ID === value.ID) {
+                            return { ...item, cartQty: item.cartQty + 1 }
+                        }
+                        return item
+                    })
+                }
+            }
+
+            return [...prev, { ...value, cartQty: 1 }]
+        })
     }
 
     if (!props.data) {
@@ -76,8 +106,8 @@ function ListOfProducts(props: ListOfProductsProps) {
         <div className="flex flex-col space-y-4">
             {props.data.map((category, index) => (
                 <div key={index} className="space-y-4">
-                    <h1>{category.name}</h1>
-                    <div className="grid grid-cols-4 gap-4">
+                    <h1 className="text-xl font-extrabold">{category.name}</h1>
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {category.items &&
                             category.items.map((item, index) => (
                                 <Card
