@@ -26,3 +26,32 @@ export const mutableCategorySchema = z.object({
 })
 
 export type MutableCategoryType = z.infer<typeof mutableCategorySchema>
+
+export const pointOfSaleCategoryItemsSchema = z.object({
+    ID: z.string(),
+    variantID: z.string().nullish(),
+    productName: z.string(),
+    variantName: z.string().nullish(),
+    variantValue: z.string().nullish(),
+    imageURL: z.string(),
+    price: z.number(),
+    quantity: z.number(),
+})
+
+export type PointOfSaleCategoryItemsType = z.infer<
+    typeof pointOfSaleCategoryItemsSchema
+>
+
+export const pointOfSaleCategorySchema = z.object({
+    ID: z.string(),
+    name: z.string(),
+    items: z.array(pointOfSaleCategoryItemsSchema).nullish(),
+})
+
+export type PointOfSaleCategoryType = z.infer<typeof pointOfSaleCategorySchema>
+
+export const pointOfSaleCategoryListSchema = z.array(pointOfSaleCategorySchema)
+
+export type PointOfSaleCategoryListType = z.infer<
+    typeof pointOfSaleCategoryListSchema
+>

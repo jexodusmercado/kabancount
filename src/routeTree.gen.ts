@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SignInRouteImport } from './routes/sign-in/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as RouteImport } from './routes/route'
+import { Route as AuthPointOfSaleRouteImport } from './routes/_auth/point-of-sale/route'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard/route'
 import { Route as AuthProductsIndexImport } from './routes/_auth/products/index'
+import { Route as AuthPointOfSaleIndexImport } from './routes/_auth/point-of-sale/index'
 import { Route as AuthProductsCreateImport } from './routes/_auth/products/create'
 import { Route as AuthProductsProductIdImport } from './routes/_auth/products/$productId'
 
@@ -36,6 +38,11 @@ const RouteRoute = RouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AuthPointOfSaleRouteRoute = AuthPointOfSaleRouteImport.update({
+  path: '/point-of-sale',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
 const AuthDashboardRouteRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRouteRoute,
@@ -44,6 +51,11 @@ const AuthDashboardRouteRoute = AuthDashboardRouteImport.update({
 const AuthProductsIndexRoute = AuthProductsIndexImport.update({
   path: '/products/',
   getParentRoute: () => AuthRouteRoute,
+} as any)
+
+const AuthPointOfSaleIndexRoute = AuthPointOfSaleIndexImport.update({
+  path: '/',
+  getParentRoute: () => AuthPointOfSaleRouteRoute,
 } as any)
 
 const AuthProductsCreateRoute = AuthProductsCreateImport.update({
@@ -88,6 +100,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRouteImport
     }
+    '/_auth/point-of-sale': {
+      id: '/_auth/point-of-sale'
+      path: '/point-of-sale'
+      fullPath: '/point-of-sale'
+      preLoaderRoute: typeof AuthPointOfSaleRouteImport
+      parentRoute: typeof AuthRouteImport
+    }
     '/_auth/products/$productId': {
       id: '/_auth/products/$productId'
       path: '/products/$productId'
@@ -101,6 +120,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/products/create'
       preLoaderRoute: typeof AuthProductsCreateImport
       parentRoute: typeof AuthRouteImport
+    }
+    '/_auth/point-of-sale/': {
+      id: '/_auth/point-of-sale/'
+      path: '/'
+      fullPath: '/point-of-sale/'
+      preLoaderRoute: typeof AuthPointOfSaleIndexImport
+      parentRoute: typeof AuthPointOfSaleRouteImport
     }
     '/_auth/products/': {
       id: '/_auth/products/'
@@ -118,6 +144,9 @@ export const routeTree = rootRoute.addChildren({
   RouteRoute,
   AuthRouteRoute: AuthRouteRoute.addChildren({
     AuthDashboardRouteRoute,
+    AuthPointOfSaleRouteRoute: AuthPointOfSaleRouteRoute.addChildren({
+      AuthPointOfSaleIndexRoute,
+    }),
     AuthProductsProductIdRoute,
     AuthProductsCreateRoute,
     AuthProductsIndexRoute,
@@ -145,6 +174,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/route.tsx",
       "children": [
         "/_auth/dashboard",
+        "/_auth/point-of-sale",
         "/_auth/products/$productId",
         "/_auth/products/create",
         "/_auth/products/"
@@ -157,6 +187,13 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_auth/dashboard/route.tsx",
       "parent": "/_auth"
     },
+    "/_auth/point-of-sale": {
+      "filePath": "_auth/point-of-sale/route.tsx",
+      "parent": "/_auth",
+      "children": [
+        "/_auth/point-of-sale/"
+      ]
+    },
     "/_auth/products/$productId": {
       "filePath": "_auth/products/$productId.tsx",
       "parent": "/_auth"
@@ -164,6 +201,10 @@ export const routeTree = rootRoute.addChildren({
     "/_auth/products/create": {
       "filePath": "_auth/products/create.tsx",
       "parent": "/_auth"
+    },
+    "/_auth/point-of-sale/": {
+      "filePath": "_auth/point-of-sale/index.tsx",
+      "parent": "/_auth/point-of-sale"
     },
     "/_auth/products/": {
       "filePath": "_auth/products/index.tsx",
