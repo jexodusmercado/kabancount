@@ -8,7 +8,7 @@ export const categorySchema = z.object({
     name: z.string(),
     description: z.string(),
     companyId: z.string(),
-    products: z.array(ProductSchema.optional()),
+    products: z.array(ProductSchema).nullish(),
 })
 
 export type CategoryType = z.infer<typeof categorySchema>

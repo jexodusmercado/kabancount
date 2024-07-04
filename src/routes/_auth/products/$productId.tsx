@@ -295,7 +295,13 @@ function UpdateCategoryPage() {
                                     <CardHeader>
                                         <CardTitle> Pricing </CardTitle>
                                         <CardDescription>
-                                            Manage your pricing
+                                            <span>
+                                                Manage your pricing for the
+                                                product. &nbsp;
+                                                <b>
+                                                    Variants will override this.
+                                                </b>
+                                            </span>
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -346,7 +352,12 @@ function UpdateCategoryPage() {
                                     <CardHeader>
                                         <CardTitle> Inventory </CardTitle>
                                         <CardDescription>
-                                            Manage your inventory
+                                            <span>
+                                                Manage your inventory. &nbsp;
+                                                <b>
+                                                    Variants will override this.
+                                                </b>
+                                            </span>
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">

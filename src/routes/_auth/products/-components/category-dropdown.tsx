@@ -17,7 +17,10 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover'
 import { useEffect } from 'react'
-import { CategoryType } from '@/services/category/schema'
+import { CategoryType, MutableCategoryType } from '@/services/category/schema'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createCategoryApi } from '@/services/category'
+import { toast } from 'sonner'
 
 interface CategoryComboboxProps {
     categories: CategoryType[]
@@ -26,8 +29,36 @@ interface CategoryComboboxProps {
 }
 
 export function CategoryCombobox(props: CategoryComboboxProps) {
+    const queryClient = useQueryClient()
     const [open, setOpen] = React.useState(false)
+    const [searchValue, setSearchValue] = React.useState('')
     const [categoryID, setCategoryID] = React.useState('')
+
+    const createCategoryMu = useMutation({
+        mutationFn: (data: MutableCategoryType) => createCategoryApi(data),
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({
+                queryKey: ['categories'],
+            })
+            setCategoryID(data.id)
+            setOpen(false)
+        },
+    })
+
+    const onCreateClick = () => {
+        if (searchValue) {
+            const promisedMu = createCategoryMu.mutateAsync({
+                name: searchValue,
+                description: 'This is created thru combobox',
+            })
+
+            toast.promise(promisedMu, {
+                loading: 'Creating category...',
+                success: 'Category created!',
+                error: 'Failed to create category',
+            })
+        }
+    }
 
     useEffect(() => {
         if (props.value) {
@@ -63,9 +94,24 @@ export function CategoryCombobox(props: CategoryComboboxProps) {
             </PopoverTrigger>
             <PopoverContent className="p-0">
                 <Command>
-                    <CommandInput placeholder="Search Category..." />
+                    <CommandInput
+                        placeholder="Search Category..."
+                        value={searchValue}
+                        onValueChange={setSearchValue}
+                    />
                     <CommandList>
-                        <CommandEmpty>No category found.</CommandEmpty>
+                        <CommandEmpty>
+                            {searchValue && (
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    className="italic text-blue-500"
+                                    onClick={onCreateClick}
+                                >
+                                    Add "{searchValue}" as Category?
+                                </Button>
+                            )}
+                        </CommandEmpty>
                         <CommandGroup>
                             {props.categories.map((category) => (
                                 <CommandItem
