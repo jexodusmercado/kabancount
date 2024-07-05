@@ -13,13 +13,14 @@ import { Button } from '@/components/ui/button'
 import { createTransactionApi } from '@/services/transaction'
 import { CreateTransactionType } from '@/services/transaction/schema'
 import { CartItemsType, cartItemsAtom } from '@/store/cart'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { toast } from 'sonner'
 
 const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
 
 export function CartSidebar() {
+    const queryClient = useQueryClient()
     const [cartItems, setCartItems] = useAtom(cartItemsAtom)
 
     const checkoutButton = useMutation({
@@ -37,6 +38,9 @@ export function CartSidebar() {
             createTransactionApi(body)
         },
         onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['products'],
+            })
             setCartItems([])
         },
     })
