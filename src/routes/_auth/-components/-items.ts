@@ -1,4 +1,9 @@
-import { HomeIcon, LucideIcon, PackageOpenIcon } from 'lucide-react'
+import {
+    HomeIcon,
+    LandmarkIcon,
+    LucideIcon,
+    PackageOpenIcon,
+} from 'lucide-react'
 
 export interface NavigationItem {
     name: string
@@ -13,5 +18,10 @@ export const navigation: NavigationItem[] = [
         name: 'Products',
         href: '/products',
         icon: PackageOpenIcon,
+    },
+    {
+        name: 'Point-of-Sale',
+        href: '/point-of-sale',
+        icon: LandmarkIcon,
     },
 ]

@@ -119,7 +119,7 @@ export function Sidebar() {
                                                             >
                                                                 <item.icon
                                                                     className={cn(
-                                                                        'h-6 w-6 shrink-0',
+                                                                        'h-4 w-4 shrink-0',
                                                                     )}
                                                                     aria-hidden="true"
                                                                 />
