@@ -3,6 +3,7 @@ import {
     MutableCategoryType,
     PaginatedCategoriesSchema,
     categorySchema,
+    pointOfSaleCategoryListSchema,
 } from './schema'
 
 export const getCategoriesApi = async () => {
@@ -30,4 +31,10 @@ export const updateCategoryApi = async (
     const res = await axiosInstance.put(`/categories/${id}`, props)
 
     return categorySchema.parse(res.data)
+}
+
+export const getCategoriesPointOfSaleApi = async () => {
+    const res = await axiosInstance.get('/categories/pos')
+
+    return pointOfSaleCategoryListSchema.parse(res.data)
 }
