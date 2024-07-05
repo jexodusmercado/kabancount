@@ -73,7 +73,7 @@ export const columns: ColumnDef<ProductType>[] = [
                     : `P${lowestPrice} - P${highestPrice}`
             }
 
-            return `$${row.original.basePrice}`
+            return `P${row.original.basePrice}`
         },
     },
     {
