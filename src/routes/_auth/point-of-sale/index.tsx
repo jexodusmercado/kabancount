@@ -13,11 +13,6 @@ import {
 } from '@/services/category/schema'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-    CreateTransactionItemType,
-    CreateTransactionType,
-} from '@/services/transaction/schema'
-import { useFieldArray, useForm } from 'react-hook-form'
 import { useSetAtom } from 'jotai'
 import { cartItemsAtom } from '@/store/cart'
 
