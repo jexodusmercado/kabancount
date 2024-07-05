@@ -5,8 +5,13 @@ import {
     ProductSchema,
 } from './schema'
 
-export const getProductsApi = async () => {
-    const res = await axiosInstance.get('/products')
+export const getProductsApi = async (page: string, pageSize: string) => {
+    const res = await axiosInstance.get('/products', {
+        params: {
+            page,
+            pageSize,
+        },
+    })
 
     const data = PaginatedProductsSchema.parse(res.data)
 

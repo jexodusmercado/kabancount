@@ -18,7 +18,7 @@ export const Route = createFileRoute('/_auth/products/')({
 const productsQueryOptions = () =>
     queryOptions({
         queryKey: ['products'],
-        queryFn: () => getProductsApi(),
+        queryFn: () => getProductsApi('1', '100'),
     })
 
 function Products() {

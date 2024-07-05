@@ -1,5 +1,19 @@
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { createTransactionApi } from '@/services/transaction'
+import { CreateTransactionType } from '@/services/transaction/schema'
 import { CartItemsType, cartItemsAtom } from '@/store/cart'
+import { useMutation } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { toast } from 'sonner'
 
@@ -7,6 +21,35 @@ const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
 
 export function CartSidebar() {
     const [cartItems, setCartItems] = useAtom(cartItemsAtom)
+
+    const checkoutButton = useMutation({
+        mutationFn: async () => {
+            const body: CreateTransactionType = {
+                type: 'PHYSICAL-STORE',
+                status: 'DONE',
+                paymentMethod: 'CASH',
+                items: cartItems.map((item) => ({
+                    productId: item.ID,
+                    productVariantId: item.variantID || '',
+                    quantity: item.cartQty,
+                })),
+            }
+            createTransactionApi(body)
+        },
+        onSuccess: () => {
+            setCartItems([])
+        },
+    })
+
+    const handleCheckOut = () => {
+        const promisedMu = checkoutButton.mutateAsync()
+
+        toast.promise(promisedMu, {
+            loading: 'Processing...',
+            success: 'Checkout successful',
+            error: 'Checkout failed',
+        })
+    }
 
     const handleRemoveItem = (value: CartItemsType) => {
         if (value.variantID) {
@@ -181,7 +224,27 @@ export function CartSidebar() {
                         </p>
                     </div>
                     <div>
-                        <Button> Checkout </Button>
+                        <AlertDialog>
+                            <AlertDialogTrigger>Open</AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you absolutely sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                        Cancel
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleCheckOut}>
+                                        Continue
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
             </div>

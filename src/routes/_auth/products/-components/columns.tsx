@@ -69,8 +69,8 @@ export const columns: ColumnDef<ProductType>[] = [
                 const lowestPrice = getLowestPrice(row.original.variants)
 
                 return highestPrice === lowestPrice
-                    ? `$${highestPrice}`
-                    : `$${lowestPrice} - $${highestPrice}`
+                    ? `P${highestPrice}`
+                    : `P${lowestPrice} - P${highestPrice}`
             }
 
             return `$${row.original.basePrice}`
