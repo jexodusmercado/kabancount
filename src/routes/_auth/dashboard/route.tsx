@@ -54,6 +54,15 @@ function Dashboard() {
             <div className="py-4">
                 <h1> Transaction </h1>
             </div>
+            <div>
+                <h2>
+                    Total earned:
+                    {transaction.reduce(
+                        (acc, curr) => acc + curr.total_amount,
+                        0,
+                    )}{' '}
+                </h2>
+            </div>
             <div className="space-y-4">
                 <div className="flex items-end w-full">
                     <DatePicker
