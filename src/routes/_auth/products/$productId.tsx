@@ -106,6 +106,7 @@ function UpdateCategoryPage() {
             categoryID: product.categoryId,
             productBarcode: product.barcode,
             productBasePrice: product.basePrice,
+            productDiscountedPrice: product.discountedPrice,
             productCostPrice: product.costPrice,
             productQuantity: product.inventory.quantity,
             productStatus: product.status,
@@ -121,6 +122,7 @@ function UpdateCategoryPage() {
                       variantSKU: v.sku,
                       variantBarcode: v.barcode,
                       variantBasePrice: v.basePrice,
+                      variantDiscountedPrice: v.discountedPrice,
                       variantCostPrice: v.costPrice,
                       variantStatus: v.status,
                       variantQuantity: v.inventory.quantity,
@@ -325,6 +327,27 @@ function UpdateCategoryPage() {
                                                 </div>
                                             )}
                                         />
+                                        <FormField
+                                            control={form.control}
+                                            name="productDiscountedPrice"
+                                            render={({ field }) => (
+                                                <div>
+                                                    <FormLabel>
+                                                        Discounted Price
+                                                    </FormLabel>
+                                                    <FormControl>
+                                                        <CurrencyInput
+                                                            {...field}
+                                                            getPassedNumber={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </div>
+                                            )}
+                                        />
+
                                         <FormField
                                             control={form.control}
                                             name="productCostPrice"
@@ -640,6 +663,10 @@ function ProductVariants() {
                                     Base Price
                                 </TableHead>
                                 <TableHead className="w-36">
+                                    Discounted Price
+                                </TableHead>
+
+                                <TableHead className="w-36">
                                     Cost Price
                                 </TableHead>
                                 <TableHead className="w-12">Quantity</TableHead>
@@ -690,6 +717,28 @@ function ProductVariants() {
                                             )}
                                         />
                                     </TableCell>
+                                    <TableCell>
+                                        <FormField
+                                            control={control}
+                                            key={field.id}
+                                            name={`variants.${index}.variantDiscountedPrice`}
+                                            render={({ field, fieldState }) => (
+                                                <FormControl>
+                                                    <CurrencyInput
+                                                        {...field}
+                                                        className={cn(
+                                                            fieldState.error &&
+                                                                'border-destructive',
+                                                        )}
+                                                        getPassedNumber={
+                                                            field.onChange
+                                                        }
+                                                    />
+                                                </FormControl>
+                                            )}
+                                        />
+                                    </TableCell>
+
                                     <TableCell>
                                         <FormField
                                             control={control}

@@ -34,6 +34,8 @@ export const pointOfSaleCategoryItemsSchema = z.object({
     variantName: z.string().nullish(),
     variantValue: z.string().nullish(),
     imageURL: z.string(),
+    originalPrice: z.number(),
+    isDiscounted: z.boolean(),
     price: z.number(),
     quantity: z.number(),
 })

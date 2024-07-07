@@ -135,7 +135,19 @@ function ListOfProducts(props: ListOfProductsProps) {
                                                         : ''}
                                                 </span>
                                                 <span className="font-bold text-black text-lg">
-                                                    P{item.price}
+                                                    {item.isDiscounted ? (
+                                                        <span>
+                                                            <span className="line-through text-gray-400">
+                                                                P
+                                                                {
+                                                                    item.originalPrice
+                                                                }
+                                                            </span>{' '}
+                                                            P{item.price}
+                                                        </span>
+                                                    ) : (
+                                                        <>P{item.price}</>
+                                                    )}
                                                 </span>
                                             </div>
                                         </CardDescription>
