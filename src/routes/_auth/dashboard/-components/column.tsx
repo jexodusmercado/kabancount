@@ -21,7 +21,11 @@ export const columns: ColumnDef<TransactionType>[] = [
     {
         accessorKey: 'transaction_items',
         header: '# Items',
-        cell: ({ row }) => row.original.transaction_items.length,
+        cell: ({ row }) => {
+            row.original.transaction_items
+                ? row.original.transaction_items.length
+                : 0
+        },
     },
     {
         accessorKey: 'createdAt',
