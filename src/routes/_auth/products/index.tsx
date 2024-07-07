@@ -8,6 +8,7 @@ import { getProductsApi, searchProductByQueryApi } from '@/services/product'
 import { useEffect, useState } from 'react'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ProductsType } from '@/services/product/schema'
+import { DeleteDialog } from './-components/delete-dialog'
 
 export const Route = createFileRoute('/_auth/products/')({
     loader: (opts) =>
@@ -25,8 +26,9 @@ function Products() {
     const productsQuery = useSuspenseQuery(productsQueryOptions())
     const products = productsQuery.data
     const [query, setQuery] = useState('')
-    const debouncedQuery = useDebounce(query, 500)
     const [data, setData] = useState<ProductsType>([])
+    const [selectedIds, setSelectedIds] = useState<string[]>([])
+    const debouncedQuery = useDebounce(query, 500)
 
     const { data: queryProducts } = useQuery({
         queryKey: ['products', debouncedQuery],
@@ -61,14 +63,20 @@ function Products() {
                         onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>
-                <div>
+                <div className="flex gap-2">
+                    <DeleteDialog selectedIds={selectedIds} />
                     <Link to="/products/create">
-                        <Button>Create Product</Button>
+                        <Button>Create</Button>
                     </Link>
                 </div>
             </div>
+            <div></div>
             <div>
-                <DataTable columns={columns} data={data} />
+                <DataTable
+                    columns={columns}
+                    data={data}
+                    getSelectedIds={setSelectedIds}
+                />
             </div>
         </div>
     )
