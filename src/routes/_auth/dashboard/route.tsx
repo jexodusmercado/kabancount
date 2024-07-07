@@ -4,7 +4,6 @@ import { getTransactionsApi } from '@/services/transaction'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
-import { start } from 'repl'
 import { DataTable } from './-components/data-table'
 import { columns } from './-components/column'
 
