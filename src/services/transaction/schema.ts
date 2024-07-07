@@ -39,7 +39,7 @@ export const transactionSchema = z.object({
     total_amount: z.number(),
     status: z.string(),
     payment_method: z.string(),
-    transaction_items: z.array(transactionItemSchema),
+    transaction_items: z.array(transactionItemSchema).optional(),
 })
 
 export type TransactionType = z.infer<typeof transactionSchema>
