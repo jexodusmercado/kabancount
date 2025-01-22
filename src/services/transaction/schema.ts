@@ -33,6 +33,7 @@ export const transactionItemSchema = z.object({
 export type TransactionItemType = z.infer<typeof transactionItemSchema>
 
 export const transactionSchema = z.object({
+    id: z.string(),
     createdAt: z.string(),
     updatedAt: z.string(),
     type: z.string(),

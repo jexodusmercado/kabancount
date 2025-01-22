@@ -6,6 +6,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { DataTable } from './-components/data-table'
 import { columns } from './-components/column'
+import { Separator } from '@/components/ui/separator'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatCurrency } from '@/lib/number'
+import dayjs from 'dayjs'
 
 export const Route = createFileRoute('/_auth/dashboard')({
     loader: (opts) => {
@@ -27,9 +31,11 @@ const transactionsQueryOptions = (startDate: string, endDate: string) =>
 
 function Dashboard() {
     const [startDate, setStartDate] = useState(
-        formatDateToRFC1233('2024-01-01'),
+        formatDateToRFC1233(dayjs().subtract(1, 'year').toDate()),
     )
-    const [endDate, setEndDate] = useState(formatDateToRFC1233('2024-12-31'))
+    const [endDate, setEndDate] = useState(
+        formatDateToRFC1233(dayjs().toDate()),
+    )
     const transactionsQuery = useSuspenseQuery(
         transactionsQueryOptions(startDate, endDate),
     )
@@ -51,20 +57,13 @@ function Dashboard() {
             <div className="flex flex-row py-2">
                 <h1 className="text-2xl">Dashboard</h1>
             </div>
-            <div className="py-4">
-                <h1> Transaction </h1>
-            </div>
-            <div>
-                <h2>
-                    Total earned:
-                    {transaction.reduce(
-                        (acc, curr) => acc + curr.total_amount,
-                        0,
-                    )}{' '}
-                </h2>
-            </div>
-            <div className="space-y-4">
-                <div className="flex items-end w-full">
+            <Separator />
+            <div className="flex flex-row items-center justify-between py-4">
+                <div>
+                    <h1 className="text-2xl font-bold"> Transaction </h1>
+                </div>
+                <div className="space-x-2">
+                    <span className="text-lg">Filter</span>
                     <DatePicker
                         getValueChange={handleStartDate}
                         value={startDate}
@@ -73,6 +72,23 @@ function Dashboard() {
                         getValueChange={handleEndDate}
                         value={endDate}
                     />
+                </div>
+            </div>
+            <div className="space-y-4">
+                <div className="grid grid-cols-12">
+                    <Card className="border col-span-1">
+                        <CardHeader>
+                            <CardTitle>Total</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {formatCurrency(
+                                transaction.reduce(
+                                    (acc, curr) => acc + curr.total_amount,
+                                    0,
+                                ),
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
                 <DataTable columns={columns} data={transaction} />
             </div>

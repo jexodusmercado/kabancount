@@ -13,5 +13,7 @@ export const loginApi = async (props: LoginType) => {
 }
 
 export const logoutApi = async () => {
-    await axiosInstance.post('/auth/logout')
+    const res = await axiosInstance.post('/auth/logout')
+
+    return res.data
 }
