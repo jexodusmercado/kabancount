@@ -1,6 +1,5 @@
 import {
     Card,
-    CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
@@ -28,8 +27,6 @@ const pointOfSaleQueryOptions = () =>
         queryKey: ['point-of-sale'],
         queryFn: () => getCategoriesPointOfSaleApi(),
     })
-
-const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
 
 function PointOfSalePage() {
     const pointOfSaleQuery = useQuery(pointOfSaleQueryOptions())

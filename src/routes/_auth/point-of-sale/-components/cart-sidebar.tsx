@@ -18,8 +18,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { toast } from 'sonner'
 
-const BUCKET_URL = import.meta.env.VITE_BUCKET_URL
-
 export function CartSidebar() {
     const queryClient = useQueryClient()
     const [cartItems, setCartItems] = useAtom(cartItemsAtom)
