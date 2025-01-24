@@ -75,7 +75,7 @@ function Dashboard() {
                 </div>
             </div>
             <div className="space-y-4">
-                <div className="grid grid-cols-12">
+                <div className="grid grid-cols-3">
                     <Card className="border col-span-1">
                         <CardHeader>
                             <CardTitle>Total</CardTitle>

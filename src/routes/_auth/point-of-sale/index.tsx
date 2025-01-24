@@ -15,6 +15,7 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useSetAtom } from 'jotai'
 import { cartItemsAtom } from '@/store/cart'
+import { formatCurrency } from '@/lib/number'
 
 export const Route = createFileRoute('/_auth/point-of-sale/')({
     loader: (opts) =>
@@ -110,25 +111,12 @@ function ListOfProducts(props: ListOfProductsProps) {
                                     className="cursor-pointer"
                                     onClick={() => handleAddToCart(item)}
                                 >
-                                    <CardContent className="pt-4">
-                                        <div>
-                                            <img
-                                                src={
-                                                    item.imageURL
-                                                        ? `${BUCKET_URL}${item.imageURL}`
-                                                        : 'https://via.placeholder.com/150'
-                                                }
-                                                alt={item.productName}
-                                                className="w-full h-40 object-cover object-center rounded-lg"
-                                            />
-                                        </div>
-                                    </CardContent>
-                                    <CardHeader className="pt-0">
+                                    <CardHeader className="">
                                         <CardTitle className="text-lg text-center">
                                             {item.productName}
                                         </CardTitle>
                                         <CardDescription>
-                                            <div className="flex items-center justify-between">
+                                            <div className="flex items-center justify-center space-x-4">
                                                 <span className="text-lg">
                                                     {item.variantName
                                                         ? `${item.variantName} - ${item.variantValue}`
@@ -143,10 +131,20 @@ function ListOfProducts(props: ListOfProductsProps) {
                                                                     item.originalPrice
                                                                 }
                                                             </span>{' '}
-                                                            P{item.price}
+                                                            {item.price
+                                                                ? formatCurrency(
+                                                                      item.price,
+                                                                  )
+                                                                : ''}
                                                         </span>
                                                     ) : (
-                                                        <>P{item.price}</>
+                                                        <>
+                                                            {item.price
+                                                                ? formatCurrency(
+                                                                      item.price,
+                                                                  )
+                                                                : ''}
+                                                        </>
                                                     )}
                                                 </span>
                                             </div>

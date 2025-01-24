@@ -10,6 +10,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
+import { formatCurrency } from '@/lib/number'
 import { createTransactionApi } from '@/services/transaction'
 import { CreateTransactionType } from '@/services/transaction/schema'
 import { CartItemsType, cartItemsAtom } from '@/store/cart'
@@ -71,7 +72,14 @@ export function CartSidebar() {
                 const item = prev.find(
                     (item) => item.variantID === value.variantID,
                 )
+
                 if (item) {
+                    if (item.cartQty <= 1) {
+                        return prev.filter(
+                            (item) => item.variantID !== value.variantID,
+                        )
+                    }
+
                     return prev.map((item) => {
                         if (item.variantID === value.variantID) {
                             return { ...item, cartQty: item.cartQty - 1 }
@@ -85,6 +93,12 @@ export function CartSidebar() {
             setCartItems((prev) => {
                 const item = prev.find((item) => item.ID === value.ID)
                 if (item) {
+                    if (item.cartQty <= 1) {
+                        return prev.filter(
+                            (item) => item.variantID !== value.variantID,
+                        )
+                    }
+
                     return prev.map((item) => {
                         if (item.ID === value.ID) {
                             return { ...item, cartQty: item.cartQty - 1 }
@@ -138,7 +152,7 @@ export function CartSidebar() {
         cartItems.forEach((item) => {
             total += item.price * item.cartQty
         })
-        return total
+        return formatCurrency(total)
     }
 
     return (
@@ -164,30 +178,21 @@ export function CartSidebar() {
                                     key={index}
                                     className="flex w-full gap-x-2 items-center"
                                 >
-                                    <img
-                                        src={
-                                            item.imageURL
-                                                ? `${BUCKET_URL}${item.imageURL}`
-                                                : 'https://via.placeholder.com/150'
-                                        }
-                                        alt={item.productName}
-                                        className="hidden md:block w-28 h-20 object-cover object-center rounded-lg"
-                                    />
                                     <div className="">
-                                        <p className="text-sm font-semibold">
+                                        <p className="text-lg font-semibold">
                                             {item.productName}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-lg text-gray-500">
                                             {item.variantName
                                                 ? item.variantName +
                                                   ' - ' +
                                                   item.variantValue
                                                 : ''}
                                         </p>
-                                        <p className="text-xs text-gray-500">
-                                            P{item.price}
+                                        <p className="text-lg text-gray-500">
+                                            {formatCurrency(item.price)}
                                         </p>
-                                        <p className="text-xs text-gray-500">
+                                        <p className="text-lg text-gray-500">
                                             Quantity: {item.cartQty}
                                         </p>
 
@@ -224,7 +229,7 @@ export function CartSidebar() {
                     <div className="flex justify-between items-center">
                         <p className="text-sm font-semibold">Total</p>
                         <p className="text-sm font-semibold">
-                            P{calculateTotal()}
+                            {calculateTotal()}
                         </p>
                     </div>
                     <div>
