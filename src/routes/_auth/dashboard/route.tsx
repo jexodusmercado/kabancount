@@ -12,13 +12,6 @@ import { formatCurrency } from '@/lib/number'
 import dayjs from 'dayjs'
 
 export const Route = createFileRoute('/_auth/dashboard')({
-    loader: (opts) => {
-        const defaultStart = formatDateToRFC1233('2024-01-01')
-        const defaultEnd = formatDateToRFC1233('2024-12-31')
-        return opts.context.queryClient.ensureQueryData(
-            transactionsQueryOptions(defaultStart, defaultEnd),
-        )
-    },
     component: Dashboard,
 })
 
